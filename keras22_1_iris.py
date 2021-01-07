@@ -59,3 +59,5 @@ print("loss :", loss)
 # y_pred = model.predict(x[-5:-1])
 # print("y_pred:", y_pred)
 # print(y[-5:-1])
+
+#loss : [1.1571476459503174, 0.6333333253860474, 0.3207857012748718]

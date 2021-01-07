@@ -1,5 +1,3 @@
-#concatenate=>concatenate
-
 import numpy as np
 #1.데이터
 x1 = np.array([range(100), range(301, 401),range(1, 101)])
@@ -43,12 +41,11 @@ dense2 = Dense(5, activation='relu')(dense2)
 dense2 = Dense(5, activation='relu')(dense2)
 #output2 = Dense(3)(dense2)
 
-#모델변형 / Concatenat     numpy.concatenate((a1, a2, ...), axis=0, out=None)¶
+#모델변형 / concatenate
 from tensorflow.keras.layers import concatenate, Concatenate
-#from tensorflow.keras.layers import Concatenate
-#from keras.layers import  Concatenate
-merge2 = Concatenate()([dense1, dense2])
-middle1 = Dense(30)(merge2)
+from keras.layers import concatenate, Concatenate
+merge1 = concatenate([dense1, dense2])
+middle1 = Dense(30)(merge1)
 middle1 = Dense(10)(middle1)
 middle1 = Dense(10)(middle1)
 
@@ -64,11 +61,11 @@ output2 = Dense(3)(output2)
 
 #모델 선언
 model = Model(inputs=[input1, input2], 
-              outputs=[output1, output2],name = "Ensemble_Model")
+              outputs=[output1, output2])
 model.summary()
 
 #3.컴파일, 훈련
-model.compile(loss='mse', optimizer='adam', metrics=['mae'])
+model.compile(loss='mse', optimizer='adam', metrics=['mae','mse'])
 model.fit([x1_train, x2_train],[y1_train, y2_train], epochs=10, batch_size=1,
           validation_split=0.2, verbose=1)
 
@@ -83,9 +80,9 @@ print("loss:", loss)
 y1_predict, y2_predict = model.predict([x1_test, x2_test])
 
 print("=====================" )
-print("y1_predict : \n", y1_predict )
-print("=====================" )
-print("y2_predict : \n", y2_predict )
+#print("y1_predict : \n", y1_predict )
+#print("=====================" )
+#print("y2_predict : \n", y2_predict )
 
 #scikit learn
 from sklearn.metrics import mean_squared_error
@@ -97,8 +94,8 @@ RMSE1 = RMSE(y1_test,y1_predict)
 RMSE2 = RMSE(y2_test,y2_predict)
 RMSE = (RMSE1+RMSE2)/2
 
-# print("RMSE1 : ", RMSE1)
-# print("RMSE2 : ", RMSE2)
+print("RMSE1 : ", RMSE1)
+print("RMSE2 : ", RMSE2)
 print("RMSE :", RMSE)
 
 
@@ -116,10 +113,6 @@ r2_2 = r2_score(y2_test, y2_predict)
 r2 = (r2_1 + r2_2)/2
 
 
-# print("R2_1 : ", r2_1)
-# print("R2_2 : ", r2_2)
+print("R2_1 : ", r2_1)
+print("R2_2 : ", r2_2)
 print("R2 :", r2)
-
-
-#RMSE :  49.81121834591463
-# R2 :  -73.65523872940034

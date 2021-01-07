@@ -5,5 +5,3 @@
 from tensorflow.keras.datasets import boston_housing
 
 import numpy as np
-
-datastes = 

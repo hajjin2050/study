@@ -5,8 +5,8 @@ datasets = load_breast_cancer()
 
 x = datasets.data
 y = datasets.target
-print('x.shape:',x.shape)   #(569,30)
-print('y.shape:',y.shape)   #(569,)
+# print('x.shape:',x.shape)   #(569,30)
+# print('y.shape:',y.shape)   #(569,)
 
 from tensorflow.keras.utils import to_categorical
 y = to_categorical(y)
@@ -25,8 +25,8 @@ x_train = scaler.transform(x_train)
 x_val = scaler.transform(x_val)
 x_test = scaler.transform(x_test)
 
-print(x.shape)
-print(y.shape)
+# print(x.shape)
+# print(y.shape)
 
 #2.MODEL
 from tensorflow.keras.models import Sequential, Model
@@ -53,9 +53,11 @@ model.fit(x_train, y_train, epochs=1000,  batch_size=10, validation_data=(x_val,
 
 #4.EVALUATE
 loss = model.evaluate(x_test, y_test,batch_size=2)
-print("loss:",loss)
+# print("loss:",loss)
 
 
 y_pred = model.predict(x[:5])
 print('y_pred:',y_pred)
 print('y[:5], y[:5]')
+
+#loss: [0.8823392391204834, 0.8549450635910034]

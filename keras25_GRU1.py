@@ -11,12 +11,9 @@ print("y.shape: ",y.shape)
 
 x = x.reshape(4, 3, 1) # 데이터를 1개씩 잘라서 사용
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense,GRU # RNN에서 가장 대표적인 모델, RNN은 Y가 없는 데이터
-
+from tensorflow.keras.layers import Dense,GRU
 model = Sequential()
-# model.add(LSTM(10, activation='relu', input_shape=(3,1)))# LSTM(10 ->(앞에있는 숫자는 아웃풋)/(4,3,1)에서 가장앞에서 쳐내기(=행무시)
-model.add(GRU(10, activation='relu', input_length=3 ,input_dim=1))#input_length=3 ,input_dim=1  =  input_shape=(3,1)
-#LSTM 레이어를 쓰려면 데이터가 3차원(N1, N2, N3)이되어야한다(+Dense는 2차원 , CNN은 4차원)]
+model.add(GRU(10, activation='relu', input_length=3 ,input_dim=1))  #input_length=3 ,input_dim=1  =  input_shape=(3,1)
 model.add(Dense(20))
 model.add(Dense(10))
 model.add(Dense(1))

@@ -31,8 +31,8 @@ model.fit(x, y, epochs=100,batch_size=1)
 loss = model.evaluate(x,y)
 print("loss:",loss)
 
-x_pred = np.array([[5,6,7],[6,7,8]])#(3,) - > (1,3,1)
-x_pred = x_pred.reshape(2, 3, 1) #1행 3개 1개씩 잘라서 작업할것
+x_pred = np.array([5,6,7])#(3,) - > (1,3,1)
+x_pred = x_pred.reshape(1, 3, 1) #1행 3개 1개씩 잘라서 작업할것
 
 result = model.predict(x_pred)
 print("result:", result)

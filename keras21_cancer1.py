@@ -31,7 +31,6 @@ model.add(Dense(15))
 model.add(Dense(10))
 model.add(Dense(10))
 model.add(Dense(5))
-model.add(Dense(3))
 model.add(Dense(1, activation='sigmoid'))
 
 #3.compile

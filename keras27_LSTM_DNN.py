@@ -22,7 +22,7 @@ scaler.transform(x_train)
 scaler.transform(x_test)
 scaler.transform(x_val)
 
-x = x.reshape(13, 3)
+# x = x.reshape(13, 3)
 
 #2.모델링
 

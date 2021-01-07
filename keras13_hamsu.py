@@ -22,7 +22,7 @@ print("x_pred2.shape : ", x_pred2.shape)   #(1,5)
 
 from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(
-    x, y ,test_size=0.8, shuffle = True, random_state=66 )
+    x, y ,test_size=0.2, shuffle = True, random_state=66 )
 
 
 print(x_train.shape)      #(80, 3)
