@@ -8,11 +8,11 @@ print(dataset.keys()) #x값
 print(dataset.values())
 print(dataset.target_names)
 # 'setosa', 'versicolor', 'virginica'
-
+'''
 x = dataset.data
 # x = dataset['data']  + # df = pd.DataFrame(x, columns = dataset['feature_names'])
 y = dataset.target
-'''
+
 print(x)
 print(y)
 print(x.shape, y.shape) #(150, 4) (150,)
