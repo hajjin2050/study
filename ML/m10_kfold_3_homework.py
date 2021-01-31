@@ -1,61 +1,64 @@
 import numpy as np
 from sklearn.datasets import load_iris
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
+
+from sklearn.preprocessing import MinMaxScaler, StandardScaler  # 둘 중에 하나 사용
 from sklearn.model_selection import train_test_split, KFold, cross_val_score
 from sklearn.metrics import accuracy_score
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Dense, Input
 
 from sklearn.svm import LinearSVC, SVC
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neighbors import KNeighborsClassifier  # Classifier : 분류모델
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
-
-
+from sklearn.linear_model import LogisticRegression # 회귀가 아닌 분류 모델임
+#1. DATA
 dataset = load_iris()
-x = dataset.data
-y = dataset.target
-# print(dataset.DESCR)
-# print(dataset.feature_names)
-print(x.shape)
-print(y.shape)
-x_train, x_test, y_train, y_test = train_test_split(
-    x, y, train_size= 0.8, shuffle=True, random_state=66)
-x_train, x_val, y_train, y_val = train_test_split(
-    x_train, y_train, train_size= 0.8, shuffle=True, random_state=66)
+x = dataset.data 
+y = dataset.target 
 
-scaler = MinMaxScaler()
-scaler.fit(x)
-x_train = scaler.transform(x_train)
-x_val = scaler.transform(x_val)
-x_test = scaler.transform(x_test)
+# print(x.shape)  #(150, 4)
+# print(y.shape)  #(150, )
 
-print(x.shape, y.shape)#(150,4) (105,3)
+# x preprocessing >>  K-Fold 
+kfold = KFold(n_splits=5, shuffle=True) # 데이터를 5등분한다. > train data 와 test data 로 구분한다.
 
+#2. Modeling
+model=[LinearSVC(), SVC(), KNeighborsClassifier(), RandomForestClassifier(), DecisionTreeClassifier()]
+# model=[LinearSVC(), SVC(), KNeighborsClassifier(), RandomForestClassifier()]
 
-x_train, x_test,y_train, y_test = train_test_split(
-    x, y, random_state=77, shuffle= True, train_size =0.8)
+# kfold 만 적용
+# for algorithm in model :
+#     score = cross_val_score(algorithm, x, y, cv=kfold)
+    # print('score : ', score, '-'+str(algorithm))
 
-kfold = KFold(n_splits = 5, shuffle=True)
+# score :  [1.         1.         0.93333333 0.9        0.93333333] -LinearSVC()
+# score :  [0.96666667 1.         1.         0.86666667 0.93333333] -SVC()
+# score :  [0.9        0.96666667 0.96666667 0.96666667 0.96666667] -KNeighborsClassifier()
+# score :  [0.96666667 0.96666667 1.         0.96666667 0.86666667] -LogisticRegression()
+# score :  [0.96666667 0.96666667 0.93333333 0.96666667 0.93333333] -RandomForestClassifier()
+# score :  [0.93333333 0.93333333 0.96666667 0.83333333 0.96666667] -DecisionTreeClassifier()
+
+# kfold >> train, test 분리
+i = 1
+for train_index, test_index in kfold.split(x) : # 다섯번 반복
+ 
+    print(str(i)+ '번째 kfold split')
+    # print("TRAIN", train_index, '\n', "TEST", test_index)
+    x_train, x_test = x[train_index], x[test_index]
+    y_train, y_test = y[train_index], y[test_index]
     
-#2.MODEL
-model = LinearSVC()
+    # train_test_split >> train, validation 분리
+    x_train, x_val, y_train, y_val = \
+        train_test_split(x_train, y_train, train_size=0.8, shuffle=True, random_state=47)
+    # print(x.shape)          # (150, 4)
+    # print(x_train.shape)    # (96, 4)
+    # print(x_val.shape)      # (24, 4)
+    # print(x_test.shape)     # (30, 4)
 
-scores = cross_val_score(model, x_train, y_train, cv=kfold)# cv = cross_val_score/ 모델과 데이터를 엮어줌
-#x,y를 적으면 트레인을 5등분 , x_train, y_train을 적으면 발리데이션데이터 5등분
-print('scores:', scores) #scores: [1.         1.         0.83333333 0.96666667 1.        ]
+    for algorithm in model :
+        model = algorithm
+        # score = cross_val_score(algorithm, x_train, y_train, cv=kfold)
+        model.fit(x_train, y_train)
+        score = model.score(x_test, y_test)
+        print('score : ', score, '-'+str(algorithm))
+    i += 1
 
-#3.COMPILE
-# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['acc','mae'])
-# from tensorflow.keras.callbacks import EarlyStopping
-# early_stoppig = EarlyStopping(monitor='loss', patience=30, mode='auto')
-# model.fit(x, y, epochs=500,  validation_data=(x_val, y_val), batch_size=8 , callbacks=[early_stoppig], verbose=3)
-model.fit(x, y)
-
-#result = model.evaluate(x,y)
-result = model.score(x,y) #바로 스코어 => 자동으로 에큐러시 추출
-print("result :", result)
-
-y_pred = model.predict(x[-5:-1])
-
-# result : 0.9666666666666667

@@ -1,13 +1,12 @@
-#m21_2 참고해서 5개 다 만들기
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.datasets import load_iris
+from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 #1. 데이터
-dataset = load_iris()
+dataset = load_diabetes()
 x_train,x_test,y_train,y_test = train_test_split(dataset.data,dataset.target,train_size = 0.8, random_state = 33)
 
 #2. 모델
