@@ -37,14 +37,20 @@ def create_hyperparameters():
 
 hyperparameters = create_hyperparameters()
 
-from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier 
+#케라스와 묶어주기
 
 model2 = KerasClassifier(build_fn=build_model, verbose=1)
 
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 
 search = GridSearchCV(model2, hyperparameters, cv=3, refit=True)
-search.fit(x_train, y_train, verbose=1)
+
+from tensorflow.keras.callbacks import EarlyStopping,ReduceLROnPlateau
+early_stopping = EarlyStopping(monitor= 'loss', patience=5, mode='auto')
+redcuce_lr = ReduceLROnPlateau(monitor='val_loss', patience=5, factor=0.5, verbose=1)
+
+search.fit(x_train, y_train, verbose=1, epochs=100, callbacks=[early_stopping,redcuce_lr])
 acc = search.score(x_test, y_test)
 print("최종 스코어 :", acc)
 print(search.best_params_) # 내가 선택한 파라미터들
@@ -52,17 +58,12 @@ print(search.best_params_) # 내가 선택한 파라미터들
 print(search.best_score_)
 
 import pickle
-# import joblib
-# pickle.dump(search.best_estimator_.,open('../data/h5/keras64_pickle.dat', 'wb')) 
 search.best_estimator_.model.save('C:/data/h5/keras64_pickle.h5')
-
-# model3 = pickle.load(open('../data/h5/keras64_pickle.dat', 'rb'))
-# # model2 = joblib.load('../data/xgb_save/m39.joblib.dat')
+#가중치 저장
 model3 = load_model('C:/data/h5/keras64_pickle.h5')
-# # model3.load_model('../data/xgb_save/m39.xgb.model')
-# print('불러왔다!')
+# print('저장된 가중치 불러오기')
 y_pred = model3.predict(x_test)
-y_pred = np.argmax(y_pred, axis=1).reshape(-1,1)
+y_pred = np.argmax(y_pred, axis=1).reshape(-1,1) #reshape(-1,1)은 재배열의 의미
 y_test = np.argmax(y_test, axis=1).reshape(-1,1)
 
 acc2 = accuracy_score(y_test, y_pred)

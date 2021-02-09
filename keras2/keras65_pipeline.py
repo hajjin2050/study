@@ -1,14 +1,21 @@
+#목표 머신러닝과 DNN 묶어주기
+
 import numpy as np
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import Dense, Dropout, Input
 from tensorflow.keras.datasets import mnist
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV,KFold
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.pipeline import make_pipeline,Pipeline
+from tensorflow.keras.utils import to_categorical
 
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
 
 # 1. 데이터 / 전처리
 
-from tensorflow.keras.utils import to_categorical
+
 
 y_train = to_categorical(y_train)  
 y_test = to_categorical(y_test)
@@ -37,43 +44,24 @@ def bulid_model(drop=0.5, optimizer='adam'):
 
 def create_hyperparameters():
     batches = [10,20,30,40,50]
-    optimizers = ['rmsprop', 'adam', 'adadelta']
+    optimizers = ['rmsprop', 'adam']
     dropout = [0.1,0.2,0.3]
-    return {'batch_size': batches, "optimizer":optimizers, "drop":dropout}
+    return {'pl__batch_size': batches, "pl":optimizers, "pl__drop":dropout}
 
 hyperparameters = create_hyperparameters()
 model2 = bulid_model()
 
+model2 = KerasClassifier(build_fn=bulid_model, verbose=1, batch_size =32, epochs =10)
+pipe = Pipeline([("scaler",MinMaxScaler()),("pl" ,model2)]) #(전처리 , 모델)
+# 파이프 라인 위치!!!!(모델부분을 파이프라인으로 연결 (전처리-모델))
+kfold = KFold(n_splits=2, random_state=42)
+search = RandomizedSearchCV(pipe, hyperparameters, cv=kfold)
 
+search.fit(x_train,y_train)
 
-
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.pipeline import make_pipeline
-
-model2 = make_pipeline(MinMaxScaler(), model2) #(전처리 , 모델)
-# 파이프 라인 위치!!!!
-
-
-
-from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
-model2 = KerasClassifier(build_fn=bulid_model, verbose=1)
-
-from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
-
-search = RandomizedSearchCV(model2, hyperparameters, cv=3)
-# search = GridSearchCV(model2, hyperparameters, cv=3)
-
-
-search.fit(x_train,y_train, verbose=1)
-
-
-print("#################################")
-
-print(search.best_params_)
+# print(search.best_params_)
 
 print(search.best_score_)
-
-print("#################################")
 
 
 acc = search.score(x_test, y_test)
