@@ -21,10 +21,10 @@ xy_train = train_datagen.flow_from_directory(
     class_mode = 'binary',
     subset = 'training'
 )
-xy_val = train_datagen.flow_from_directory(
+xy_test = train_datagen.flow_from_directory(
     "C:/data/image/gender",
     target_size = (150, 150),
-    batch_size =14,
+    batch_size =30,
     class_mode = 'binary',
     subset = 'validation'
 )
@@ -34,29 +34,26 @@ print(xy_train[0][1].shape)
 
 np.save('C:/data/image/gender/npy/keras66_train_x.npy', arr=xy_train[0][0])
 np.save('C:/data/image/gender/npy/keras66_train_y.npy', arr=xy_train[0][1])
-np.save('C:/data/image/gender/npy/keras66_val_x.npy', arr=xy_val[0][0])
-np.save('C:/data/image/gender/npy/keras66_val_y.npy', arr=xy_val[0][1])
+np.save('C:/data/image/gender/npy/keras66_test_x.npy', arr=xy_test[0][0])
+np.save('C:/data/image/gender/npy/keras66_test_y.npy', arr=xy_test[0][1])
 
 x_train = np.load('C:/data/image/gender/npy/keras66_train_x.npy')
-x_val = np.load('C:/data/image/gender/npy/keras66_val_x.npy')
-
+x_test = np.load('C:/data/image/gender/npy/keras66_test_x.npy')
 y_train = np.load('C:/data/image/gender/npy/keras66_train_y.npy')
-y_val = np.load('C:/data/image/gender/npy/keras66_val_y.npy')
+y_test = np.load('C:/data/image/gender/npy/keras66_test_y.npy')
 
-print(x_train.shape, y_train.shape)
-print(x_val.shape, y_val.shape)
+# print(xy_train[0])
+# print(xy_train[0][0].shape)(14, 150, 150, 3)
+# print(xy_train[15][1].shape)(14,)
+# print(xy_train[15][1])[0. 1. 0. 1. 0. 1. 1. 0. 0. 1. 0. 1. 1. 0.]
+
 
 model = Sequential()
+
 model.add(Conv2D(128, 3, padding='same', activation='relu', input_shape=(150,150,3)))
 model.add(BatchNormalization())
-model.add(Conv2D(64,3, activation='relu'))
-model.add(BatchNormalization())
-model.add(Conv2D(64,3, activation='relu'))
-model.add(BatchNormalization())
-model.add(MaxPooling2D(3))
-model.add(Conv2D(32,3, activation='relu'))
-model.add(BatchNormalization())
 model.add(Flatten())
+model.add(Dense(64, activation='relu'))
 model.add(Dense(64, activation='relu'))
 model.add(Dense(32, activation='relu'))
 model.add(Dense(16, activation='relu'))
@@ -66,17 +63,19 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
 es = EarlyStopping(monitor = 'val_loss', patience = 20)
 lr = ReduceLROnPlateau(monitor = 'val_loss', patience = 30, factor = 0.5, verbose = 1)
-filepath = 'c:/data/modelcheckpoint/keras62_1_checkpoint_{val_loss:.4f}-{epoch:02d}.hdf5'
-cp = ModelCheckpoint(filepath, save_best_only=True, monitor = 'val_loss')
-history = model.fit(x_train,y_train, epochs=500, validation_data=(x_val,y_val),callbacks=[es])
+history = model.fit_generator(xy_train, steps_per_epoch=93, epochs=500, validation_data=xy_test, validation_steps=31,
+callbacks=[es,lr])
 
 acc = history.history['acc']
 val_acc = history.history['val_acc']
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
-print("acc:", acc[0])
+print("acc:", acc[-1]) acc: 0.9938555955886841
+print("acc:", val_acc[-1]) acc: 0.5138248801231384
 
+
+'''
 import matplotlib.pyplot as plt
 epochs = len(acc)
 x_axis = range(0,epochs)
@@ -97,3 +96,4 @@ ax.legend()
 plt.ylabel('loss')
 plt.title('loss')
 plt.show()
+'''
