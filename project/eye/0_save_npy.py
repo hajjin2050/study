@@ -6,10 +6,12 @@ import cv2
 import os
 import glob
 
-
+img=[]
 file_list = os.listdir('C:\data\p_project\eye\dataset_B_Eye_Images\closedLeftEyes')
 for file in file_list:
     file_list = glob.glob('*.*')
+    image2 = np.where((image <= 254) & (image != 0), 0, image)
+    image_data = np.array(file_list)
     print(file_list.shape)
 
 
