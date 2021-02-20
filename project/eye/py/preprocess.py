@@ -42,4 +42,11 @@ np.save('C:/data/p_project/eye/y_val.npy', y_val)
 
 plt.subplot(2, 1, 1) #subplot 은 한장에 여러개의 plot창을 띄움
 plt.title(str(y_train[0]))
-plt.imshow(x_train[0]/#wikidocs.net/51470
+plt.imshow(x_train[0].reshape((26, 34)), cmap='gray')
+plt.subplot(2, 1, 2)
+plt.title(str(y_val[4]))
+plt.imshow(x_val[4].reshape((26, 34)), cmap='gray')
+
+sns.distplot(y_train, kde=False)
+
+sns.distplot(y_val, kde=False)
