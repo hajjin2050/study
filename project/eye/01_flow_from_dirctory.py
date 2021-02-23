@@ -1,7 +1,8 @@
 # ImageDataGeneator의  FIT_GENERATOR 사용해서완성
-
+import PIL.Image as pilimg
 import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.python.tools import module_util as _module_util
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, Dense, Dropout, MaxPooling2D, Flatten
 
@@ -21,7 +22,7 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator(rescale=1./255)
 
 xy_train = train_datagen.flow_from_directory(
-    "C:/data/image/close", # 눈감은 데이터셋 불러오기
+    "C:\data\p_project\eye\dataset\closed", # 눈감은 데이터셋 불러오기
     target_size =(26, 34) ,
     batch_size = 8,
     class_mode = 'binary'#'binary'에서는 앞에가 0이되면 뒤에가 알아서 1이됨(0~1 로 수렴)
@@ -29,33 +30,29 @@ xy_train = train_datagen.flow_from_directory(
 )
 
 xy_val= train_datagen.flow_from_directory(
-    "C:/data/image/open", #눈뜬 데이터 셋 불러오기
+    "C:\data\p_project\eye\dataset\open", #눈뜬 데이터 셋 불러오기
     target_size =(26, 34) ,
     batch_size = 8,
     class_mode = 'binary'#'binary'에서는 앞에가 0이되면 뒤에가 알아서 1이됨(0~1 로 수렴)
     , subset = 'validation'
 )
 
-print(xy_train[0][0].shape)
-print(xy_train[0][1].shape)
+# print(xy_train[0][0].shape)
+# print(xy_train[0][1].shape)
 
 model = Sequential()
-model.add(Conv2D(32 ,(3,3), input_shape = (150,150,3)))
+model.add(Conv2D(32 ,(3,3), input_shape = (26,34,3)))
 model.add(Flatten())
 model.add(Dense(1, activation = 'sigmoid'))
 
 #검사할 데이터를 넣어보자.
-filepath='../data/image/sex/h1.jpeg'
+filepath='C:/data/p_project/eye/dataset/test_img/1.jpg'
 image = pilimg.open(filepath)
-image_data = image.resize((150,150))
+image_data = image.resize((26,34))
 image_data = np.array(image_data)
-image_data = image_data.reshape(1,150,150,3)
+image_data = image_data.reshape(1,26,34,3)
 answer = [0]
 no_answer = [1]
-
-
-
-
 
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])

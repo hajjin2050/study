@@ -1,18 +1,21 @@
 import cv2, dlib
+#dlib가 opencv보다는 성능이 좋지만 속도는 떨어진다.
 import numpy as np
 from imutils import face_utils
 from keras.models import load_model
 
-IMG_SIZE = (34, 26)
+IMG_SIZE = (34, 26) 
 
 detector = dlib.get_frontal_face_detector()
+#정면 얼굴 검출기로 입력사진 img 에서 얼굴을 검출하여 eye로반환
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+#'shape_predictor_68_face_landmarks.dat' -> 얼굴인식을 하기위한 미리 마련된 데이터
 
-model = load_model('models/2018_12_17_22_58_35.h5')
-model.summary()
+# model = load_model('models/2018_12_17_22_58_35.h5')
+# model.summary()
 
 def crop_eye(img, eye_points):
-  x1, y1 = np.amin(eye_points, axis=0)
+  x1, y1 = np.amin(eye_points, axis=0) 
   x2, y2 = np.amax(eye_points, axis=0)
   cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
 

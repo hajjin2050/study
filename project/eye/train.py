@@ -7,17 +7,18 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 plt.style.use('dark_background')
 
+#데이터셋 불러오기
 
-#데이터 불러오기
-x_train = np.load('C:/data/p_project/eye/npy/x_train.npy').astype(np.float32)
-y_train = np.load('C:/data/p_project/eye/npy/y_train.npy').astype(np.float32)
-x_val = np.load('C:/data/p_project/eye/npy/x_val.npy').astype(np.float32)
-y_val = np.load('C:/data/p_project/eye/npy/y_val.npy').astype(np.float32)
+x_train = np.load('dataset/x_train.npy').astype(np.float32)
+y_train = np.load('dataset/y_train.npy').astype(np.float32)
+x_val = np.load('dataset/x_val.npy').astype(np.float32)
+y_val = np.load('dataset/y_val.npy').astype(np.float32)
 
 print(x_train.shape, y_train.shape)
 print(x_val.shape, y_val.shape)
 
-# 시각화
+#시각화
+
 plt.subplot(2, 1, 1)
 plt.title(str(y_train[0]))
 plt.imshow(x_train[0].reshape((26, 34)), cmap='gray')
@@ -25,7 +26,7 @@ plt.subplot(2, 1, 2)
 plt.title(str(y_val[4]))
 plt.imshow(x_val[4].reshape((26, 34)), cmap='gray')
 
-#이미지 늘려주기
+#generator 선언
 
 train_datagen = ImageDataGenerator(
     rescale=1./255,
@@ -49,7 +50,8 @@ val_generator = val_datagen.flow(
     shuffle=False
 )
 
-#모델링
+#Build Model
+
 inputs = Input(shape=(26, 34, 1))
 
 net = Conv2D(32, kernel_size=3, strides=1, padding='same', activation='relu')(inputs)
@@ -74,22 +76,24 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 
 model.summary()
 
-#훈련
+#Train
+
 start_time = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
 
 model.fit_generator(
     train_generator, epochs=50, validation_data=val_generator,
     callbacks=[
-        ModelCheckpoint('C:/data/p_project/eye/model/%s.h5' % (start_time), monitor='val_acc', save_best_only=True, mode='max', verbose=1),
+        ModelCheckpoint('models/%s.h5' % (start_time), monitor='val_acc', save_best_only=True, mode='max', verbose=1),
         ReduceLROnPlateau(monitor='val_acc', factor=0.2, patience=10, verbose=1, mode='auto', min_lr=1e-05)
     ]
 )
 
-#confusion matrix(어큐러시를 시각화해서 확인)
+#Confusion Matrix
+
 from sklearn.metrics import accuracy_score, confusion_matrix
 import seaborn as sns
 
-model = load_model('C:/data/p_project/eye/model/%s.h5' % (start_time))
+model = load_model('models/%s.h5' % (start_time))
 
 y_pred = model.predict(x_val/255.)
 y_pred_logical = (y_pred > 0.5).astype(np.int)
@@ -99,4 +103,5 @@ cm = confusion_matrix(y_val, y_pred_logical)
 sns.heatmap(cm, annot=True)
 
 #Distribution of Prediction
+
 ax = sns.distplot(y_pred, kde=False)
